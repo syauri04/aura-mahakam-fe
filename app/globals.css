@@ -1,26 +1,81 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-staatliches: var(--font-staatliches);
+  --font-jakarta: var(--font-plus-jakarta-sans);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Custom color tokens — generates bg-*, text-*, border-* utilities */
+@theme {
+  --color-gold: #f8c260;
+  --color-gold-light: #f8dc60;
+  --color-teal: #00c2ba;
+  --color-orange: #ef8547;
+  --color-red: #f94144;
+  --color-purple-neon: #ba32a0;
+  --color-purple-light: #cb6ce6;
+  --color-pink-neon: #ba32a0;
+}
+
+/* Gradient border via pseudo-element mask trick */
+@utility gradient-border {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    padding: 1.5px;
+    background: linear-gradient(270deg, #f8dc60 0%, #00c2ba 100%);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-jakarta-face), sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f8dc60 0%, #00c2ba 100%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  border-radius: 3px;
+}
+
+.petisi-content ul {
+  margin: 0;
+}
+
+.petisi-content li {
+  break-inside: avoid;
+  margin-bottom: 28px;
+  line-height: 2rem;
+  font-size: 16px;
+}
+
+.petisi-content li strong {
+  font-weight: 700;
+}
+
+.petisi-content li::marker {
+  font-weight: 700;
 }
