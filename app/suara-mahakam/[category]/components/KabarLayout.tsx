@@ -13,7 +13,7 @@ const FEATURED_ARTICLE = {
   date: "10 April 2026",
   summary:
     "27.923 jiwa masyarakat adat di Mahakam Ulu bergantung pada hutan sebagai sumber mata pencaharian. Suku Dayak seperti Busang, Kenyah, Kayan, Bahau, Penihing, Aoheng, Modang, Laham, dan Long Kelat, tersebar di 5 Kecamatan dan 49 Kampung.",
-  href: "/siaran-pers/kesaksian-benua-etam",
+  href: "kabar-mahakam/kesaksian-benua-etam",
 };
 
 const ARTICLES = [
@@ -24,7 +24,7 @@ const ARTICLES = [
     date: "9 April 2026",
     summary:
       "Di Mahakam Ulu, masyarakat adat mempertahankan tanah, hutan, dan cara hidup mereka.",
-    href: "/siaran-pers/hasil-hutan-mahakam",
+    href: "kabar-mahakam/hasil-hutan-mahakam",
   },
   {
     imageSrc: "/assets/suara/siaran2.jpg",
@@ -32,7 +32,7 @@ const ARTICLES = [
     title: "Kerajinan Tangan Masyarakat Mahakam",
     date: "8 April 2026",
     summary: "Dalam prosesnya, mereka juga melindungi iklim global.",
-    href: "/siaran-pers/kerajinan-tangan-mahakam",
+    href: "kabar-mahakam/kerajinan-tangan-mahakam",
   },
   {
     imageSrc: "/assets/suara/siaran3.jpg",
@@ -41,7 +41,7 @@ const ARTICLES = [
     date: "7 April 2026",
     summary:
       "Di era krisis iklim dan kemunduran demokrasi, diam bukanlah pilihan.",
-    href: "/siaran-pers/aktifitas-sungai-mahakam",
+    href: "kabar-mahakam/aktifitas-sungai-mahakam",
   },
   {
     imageSrc: "/assets/suara/siaran4.png",
@@ -50,7 +50,7 @@ const ARTICLES = [
     date: "6 April 2026",
     summary:
       "Menghormati hak masyarakat adat dan melindungi pembela hutan adalah bagian dari solusi iklim.",
-    href: "/siaran-pers/masyarakat-adat-mahakam-ulu",
+    href: "kabar-mahakam/masyarakat-adat-mahakam-ulu",
   },
 ];
 

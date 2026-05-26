@@ -37,8 +37,8 @@ export default function AlertCard({
           src={imageSrc}
           alt={imageAlt}
           fill
-          className="object-cover"
-          sizes="(max-width: 640px) 100vw, 325px"
+          className="object-cover rounded-[10px]"
+          sizes="(max-width: 640px) 100vw, 325px "
         />
       </div>
 

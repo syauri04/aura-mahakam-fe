@@ -14,7 +14,7 @@ const ARTICLES = [
 
     summary:
       "Benua Etam di Persimpangan: Menelusuri Dualisme Hulu dan Hilir Kalimantan Timur",
-    href: "/cerita-mahakam-heroes/benua-etam-di-persimpangan",
+    href: "cerita-mahakam-heroes/benua-etam-di-persimpangan",
   },
   {
     imageSrc: "/assets/cerita2.jpg",
@@ -24,7 +24,7 @@ const ARTICLES = [
 
     summary:
       "Mahakam di Persimpangan: Ketika Sungai yang Hidup Berjuang untuk Bernapas",
-    href: "/cerita-mahakam-heroes/mahakam-di-persimpangan",
+    href: "cerita-mahakam-heroes/mahakam-di-persimpangan",
   },
 ];
 const KARYA = [
@@ -32,18 +32,18 @@ const KARYA = [
     imageSrc: "/assets/karya1.png",
     imageAlt: "Hasil Hutan Mahakam",
 
-    href: "/cerita-mahakam-heroes/benua-etam-di-persimpangan",
+    href: "cerita-mahakam-heroes/benua-etam-di-persimpangan",
   },
   {
     imageSrc: "/assets/karya2.png",
     imageAlt: "Kerajinan Tangan Masyarakat Mahakam",
 
-    href: "/cerita-mahakam-heroes/mahakam-di-persimpangan",
+    href: "cerita-mahakam-heroes/mahakam-di-persimpangan",
   },
   {
     imageSrc: "/assets/karya3.png",
     imageAlt: "Kerajinan Tangan Masyarakat Mahakam",
-    href: "/cerita-mahakam-heroes/mahakam-di-persimpangan",
+    href: "cerita-mahakam-heroes/mahakam-di-persimpangan",
   },
 ];
 

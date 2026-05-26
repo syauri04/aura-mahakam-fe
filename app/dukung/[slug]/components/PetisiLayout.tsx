@@ -62,7 +62,7 @@ export default function PetisiLayout() {
               Gabung aksi dan kegiatan yang mendukung gerakan lanskap mahakam.
             </span>
             <motion.a
-              href="dukung/petisi/list"
+              href="petisi/list"
               whileHover={{ scale: 1.02, opacity: 0.92 }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -93,15 +93,15 @@ export default function PetisiLayout() {
           <motion.div variants={fadeUp}>
             <div
               className="
-      petisi-content
-      font-jakarta
-      text-base
-      leading-8
-      text-black
-      columns-1
-      md:columns-2
-      gap-12
-    "
+                petisi-content
+                font-jakarta
+                text-base
+                leading-8
+                text-black
+                columns-1
+                md:columns-2
+                gap-12
+              "
               dangerouslySetInnerHTML={{
                 __html: BODY_TEXT,
               }}

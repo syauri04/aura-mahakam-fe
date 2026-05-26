@@ -49,6 +49,8 @@ export default function Header() {
   const pathname = usePathname();
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
+  const [shrunk, setShrunk] = useState(false); // ← state baru: header mengecil
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [activeLang, setActiveLang] = useState(languages[0]);
@@ -59,14 +61,22 @@ export default function Header() {
   useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY;
+
+      setScrolled(currentY > 10);
+
+      // Shrunk: aktif saat sudah scroll cukup jauh (>80px) dan bukan di paling atas
+      setShrunk(currentY > 80);
+
       if (currentY < 50 || currentY < lastScrollY) {
         setVisible(true);
       } else {
         setVisible(false);
         setMobileOpen(false);
       }
+
       setLastScrollY(currentY);
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
@@ -80,20 +90,44 @@ export default function Header() {
       className="fixed top-0 left-0 right-0 z-[1000]"
     >
       {/* ── Top gradient accent line ── */}
-      <div className="h-5 bg-gradient-to-l from-gold-light to-teal" />
+      {/* Sembunyikan accent line saat shrunk agar lebih compact */}
+      <motion.div
+        animate={{ height: shrunk ? 0 : 20, opacity: shrunk ? 0 : 1 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="bg-gradient-to-l from-gold-light to-teal overflow-hidden"
+      />
 
       {/* ── Main bar ── */}
-      <div className="bg-transparent">
-        <div className="w-full max-w-[1400px] px-6 py-4 mx-auto flex items-center justify-between gap-4">
-          {/* Logo */}
+      <div
+        className={[
+          "transition-all duration-300",
+          scrolled
+            ? "bg-purple-light/80 backdrop-blur-md shadow-lg"
+            : "bg-transparent",
+        ].join(" ")}
+      >
+        <div
+          className={[
+            "w-full max-w-[1400px] px-6 mx-auto flex items-center justify-between gap-4",
+            "transition-all duration-300 ease-in-out",
+            shrunk ? "py-2" : "py-4", // ← padding mengecil
+          ].join(" ")}
+        >
+          {/* Logo — ukuran mengecil saat shrunk */}
           <Link href="/" className="flex items-center shrink-0">
-            <Image
-              src="/assets/logo.png"
-              alt="Aura Mahakam Logo"
-              width={96}
-              height={96}
-              priority
-            />
+            <motion.div
+              animate={{ width: shrunk ? 60 : 96, height: shrunk ? 60 : 96 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="relative"
+            >
+              <Image
+                src="/assets/logo.png"
+                alt="Aura Mahakam Logo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </motion.div>
           </Link>
 
           {/* ── Desktop nav ── */}
@@ -118,8 +152,9 @@ export default function Header() {
                     href={item.href}
                     className={[
                       "flex items-center gap-3 px-4 py-2 rounded-[10px]",
-                      "font-staatliches text-2xl leading-8 text-white whitespace-nowrap no-underline",
-                      "transition-all duration-200",
+                      "font-staatliches whitespace-nowrap no-underline leading-8 text-white",
+                      "transition-all duration-300",
+                      shrunk ? "text-xl" : "text-2xl", // ← font mengecil
                       isActive
                         ? "bg-gradient-to-r from-teal to-gold"
                         : "gradient-border",
@@ -129,7 +164,7 @@ export default function Header() {
 
                     {item.children && (
                       <ChevronDown
-                        size={32}
+                        size={shrunk ? 20 : 32} // ← icon mengecil
                         className={[
                           "transition-transform duration-200",
                           openDropdown === item.label
@@ -144,21 +179,9 @@ export default function Header() {
                   <AnimatePresence>
                     {item.children && openDropdown === item.label && (
                       <motion.div
-                        initial={{
-                          opacity: 0,
-                          y: -8,
-                          scale: 0.95,
-                        }}
-                        animate={{
-                          opacity: 1,
-                          y: 0,
-                          scale: 1,
-                        }}
-                        exit={{
-                          opacity: 0,
-                          y: -8,
-                          scale: 0.95,
-                        }}
+                        initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.95 }}
                         transition={{ duration: 0.18 }}
                         className="absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 min-w-[220px] bg-white rounded-xl p-2 z-[100] border gradient-border backdrop-blur-[12px] shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
                       >
@@ -191,27 +214,33 @@ export default function Header() {
 
           {/* ── Right: search + lang + hamburger ── */}
           <div className="flex items-center gap-3 shrink-0">
-            {/* Search — desktop only */}
             <button className="hidden lg:flex items-center bg-transparent border-none cursor-pointer text-white p-1.5 rounded-lg">
-              <Search size={24} />
+              <Search
+                size={shrunk ? 18 : 24}
+                className="transition-all duration-300"
+              />
             </button>
 
             {/* Language picker */}
             <div className="relative">
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-2.5 bg-transparent  px-2.5 py-1.5 cursor-pointer text-white font-staatliches text-2xl"
+                className={[
+                  "flex items-center gap-2.5 bg-transparent px-2.5 py-1.5 cursor-pointer text-white font-staatliches",
+                  "transition-all duration-300",
+                  shrunk ? "text-xl" : "text-2xl",
+                ].join(" ")}
               >
                 <img
                   src={activeLang.flag}
                   alt={activeLang.code}
-                  width={32}
+                  width={shrunk ? 24 : 32}
                   height={12}
-                  className="rounded-sm object-cover"
+                  className="rounded-sm object-cover transition-all duration-300"
                 />
                 <span>{activeLang.code}</span>
                 <ChevronDown
-                  size={32}
+                  size={shrunk ? 20 : 32}
                   className={[
                     "transition-transform duration-200",
                     langOpen ? "rotate-180" : "rotate-0",
@@ -235,7 +264,7 @@ export default function Header() {
                           setLangOpen(false);
                         }}
                         className={[
-                          "flex items-center gap-2 w-full px-3 py-2 rounded-lg border-none cursor-pointer text-black font-staatliches text-2xl ",
+                          "flex items-center gap-2 w-full px-3 py-2 rounded-lg border-none cursor-pointer text-black font-staatliches text-2xl",
                           activeLang.code === lang.code
                             ? "bg-gold/15"
                             : "bg-transparent hover:bg-white/10",

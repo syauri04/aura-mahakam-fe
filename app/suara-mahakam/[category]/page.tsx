@@ -16,11 +16,11 @@ const layoutMap = {
 export default async function SuaraPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ category: string }>;
 }) {
-  const { slug } = await params;
+  const { category } = await params;
 
-  const data = suaraData[slug as keyof typeof suaraData];
+  const data = suaraData[category as keyof typeof suaraData];
 
   if (!data) notFound();
 
