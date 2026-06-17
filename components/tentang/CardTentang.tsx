@@ -207,7 +207,8 @@ function AuraModal({ item, onClose }: AuraModalProps) {
 
 function AuraCard({ item, index }: { item: CardAuraItem; index: number }) {
   const [open, setOpen] = useState(false);
-  const imageUrl = item.image?.url ? `${STRAPI_URL}${item.image.url}` : "";
+  // const imageUrl = item.image?.url ? `${STRAPI_URL}${item.image.url}` : "";
+  const imageUrl = getStrapiImageUrl(item.image?.url);
 
   return (
     <>
