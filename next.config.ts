@@ -11,7 +11,6 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "kabeja.id",
-        port: "1337",
         pathname: "/uploads/**",
       },
       {
