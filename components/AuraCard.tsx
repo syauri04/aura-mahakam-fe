@@ -16,18 +16,22 @@ export type ButtonVariant = keyof typeof buttonVariants;
 
 interface AuraCardProps {
   title: string;
+  slug: string;
   summary: string;
   image: string;
   buttonVariant?: ButtonVariant;
   index: number;
+  locale?: string;
 }
 
 export default function AuraCard({
   title,
+  slug,
   summary,
   image,
   buttonVariant = "orange",
   index,
+  locale = "id",
 }: AuraCardProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
@@ -58,7 +62,8 @@ export default function AuraCard({
 
         {/* Button pinned to bottom */}
         <div>
-          <motion.button
+          <motion.a
+            href={`/aura/${slug}?lang=${locale}`}
             whileHover={{
               scale: 1.07,
               boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
@@ -70,7 +75,7 @@ export default function AuraCard({
             ].join(" ")}
           >
             Lihat
-          </motion.button>
+          </motion.a>
         </div>
       </div>
 

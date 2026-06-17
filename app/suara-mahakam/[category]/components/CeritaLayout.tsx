@@ -1,60 +1,41 @@
 import ArtikelSection from "@/components/utils/ArtikelSection";
 import KaryaSection from "@/components/utils/KaryaSection";
+import { getStrapiImageUrl } from "@/services/strapi";
+import { fetchCeritaMahakam } from "@/services/suara";
+import { fetchKaryaVisual } from "@/services/karya";
 
-/* ─────────────────────────────────────────────
-   Dummy data — replace with your CMS / API data
-───────────────────────────────────────────── */
+interface CeritaLayoutProps {
+  locale?: string;
+}
 
-const ARTICLES = [
-  {
-    imageSrc: "/assets/cerita1.jpg",
-    imageAlt: "Hasil Hutan Mahakam",
-    title:
-      "Benua Etam di Persimpangan: Menelusuri Dualisme Hulu dan Hilir Kalimantan Timur",
+export default async function CeritaLayout({
+  locale = "id",
+}: CeritaLayoutProps) {
+  const [items, karyaItems] = await Promise.all([
+    fetchCeritaMahakam(locale),
+    fetchKaryaVisual(locale),
+  ]);
 
-    summary:
-      "Benua Etam di Persimpangan: Menelusuri Dualisme Hulu dan Hilir Kalimantan Timur",
-    href: "cerita-mahakam-heroes/benua-etam-di-persimpangan",
-  },
-  {
-    imageSrc: "/assets/cerita2.jpg",
-    imageAlt: "Kerajinan Tangan Masyarakat Mahakam",
-    title:
-      "Mahakam di Persimpangan: Ketika Sungai yang Hidup Berjuang untuk Bernapas",
+  const articles = items.map((item) => ({
+    imageSrc: getStrapiImageUrl(
+      item.cover_image?.formats?.medium?.url ?? item.cover_image?.url ?? null,
+    ),
+    imageAlt: item.cover_image?.alternativeText ?? item.title,
+    title: item.title,
+    summary: item.summary,
+    href: `cerita-mahakam-heroes/${item.slug}`,
+  }));
 
-    summary:
-      "Mahakam di Persimpangan: Ketika Sungai yang Hidup Berjuang untuk Bernapas",
-    href: "cerita-mahakam-heroes/mahakam-di-persimpangan",
-  },
-];
-const KARYA = [
-  {
-    imageSrc: "/assets/karya1.png",
-    imageAlt: "Hasil Hutan Mahakam",
+  const karyas = karyaItems.map((k) => ({
+    imageSrc: getStrapiImageUrl(k.image?.url ?? null),
+    imageAlt: k.image?.alternativeText ?? k.title,
+    title: k.title,
+  }));
 
-    href: "cerita-mahakam-heroes/benua-etam-di-persimpangan",
-  },
-  {
-    imageSrc: "/assets/karya2.png",
-    imageAlt: "Kerajinan Tangan Masyarakat Mahakam",
-
-    href: "cerita-mahakam-heroes/mahakam-di-persimpangan",
-  },
-  {
-    imageSrc: "/assets/karya3.png",
-    imageAlt: "Kerajinan Tangan Masyarakat Mahakam",
-    href: "cerita-mahakam-heroes/mahakam-di-persimpangan",
-  },
-];
-
-/* ─────────────────────────────────────────────
-   Page
-───────────────────────────────────────────── */
-export default function CeritaLayout() {
   return (
     <main>
-      <ArtikelSection titleSection="Cerita Mahakam" articles={ARTICLES} />
-      <KaryaSection titleSection="Karya Mahakam" karyas={KARYA} />
+      <ArtikelSection titleSection="Cerita Mahakam" articles={articles} />
+      <KaryaSection titleSection="Karya Mahakam" karyas={karyas} />
     </main>
   );
 }

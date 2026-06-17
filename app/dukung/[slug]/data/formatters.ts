@@ -28,3 +28,9 @@ export function formatK(value: number): string {
   }
   return Math.round(value).toString();
 }
+
+export function autoFormat(value: number): string {
+  if (value >= 10000) return formatK(value);
+  if (value >= 1000) return formatThousands(value);
+  return formatPlain(value);
+}

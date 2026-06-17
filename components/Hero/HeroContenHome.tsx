@@ -3,7 +3,11 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 
-export default function HeroContentHome() {
+interface Props {
+  summary: string;
+}
+
+export default function HeroContentHome({ summary }: Props) {
   return (
     <div className="relative z-[2] w-full max-w-[1400px]  mx-auto px-6 flex flex-col items-center text-center gap-6">
       {/* Title */}
@@ -16,8 +20,9 @@ export default function HeroContentHome() {
         <Image
           src="/assets/Aura-Mahakam.png"
           alt="AURA MAHAKAM"
-          width={0}
-          height={0}
+          width={1200}
+          height={400}
+          priority
           sizes="100vw"
           className="w-full h-auto"
         />
@@ -30,9 +35,7 @@ export default function HeroContentHome() {
         transition={{ duration: 0.9, delay: 0.5, ease: "easeOut" }}
         className="font-jakarta font-bold text-white leading-8 max-w-[960px] [text-shadow:0px_4px_8px_rgba(0,0,0,0.2)] text-[clamp(16px,2.5vw,24px)]"
       >
-        Menjaga Lanskap Mahakam sebagai ruas tulang punggung terakhir
-        keanekaragaman hayati Kalimantan, ruang hidup Masyarakat Adat yang
-        berdaulat
+        {summary}
       </motion.p>
     </div>
   );

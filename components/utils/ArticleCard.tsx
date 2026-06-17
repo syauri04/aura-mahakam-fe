@@ -37,7 +37,7 @@ export default function ArticleCard({
       <div className="flex flex-col flex-1 pt-3">
         {/* Title */}
         {title && (
-          <h3 className="font-jakarta font-bold text-2xl text-black leading-snug line-clamp-3 min-h-[64px] group-hover:underline">
+          <h3 className="font-jakarta font-bold text-2xl text-black leading-snug line-clamp-2 min-h-[74px] group-hover:underline">
             {title}
           </h3>
         )}

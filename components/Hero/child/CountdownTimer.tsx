@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 interface CountdownTimerProps {
   targetDate: string | Date;
+  title?: string;
 }
 
 interface TimeLeft {
@@ -13,7 +14,10 @@ interface TimeLeft {
   seconds: number;
 }
 
-export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
+export default function CountdownTimer({
+  targetDate,
+  title,
+}: CountdownTimerProps) {
   const calculateTimeLeft = (now: number): TimeLeft => {
     const difference = new Date(targetDate).getTime() - now;
 
@@ -147,12 +151,14 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
           </div>
         ))}
       </div>
-      <p className="w-full text-center  font-staatliches text-[32px] text-white/80">
-        Menuju{" "}
-        <span className="font-staatliches bg-gradient-to-r from-teal to-gold bg-clip-text text-transparent">
-          (Kegiatan Terdekat)
-        </span>
-      </p>
+      {title && (
+        <p className="w-full text-center  font-staatliches text-[32px] text-white/80">
+          Menuju{" "}
+          <span className="font-staatliches bg-gradient-to-r from-teal to-gold bg-clip-text text-transparent">
+            {title}
+          </span>
+        </p>
+      )}
     </>
   );
 }

@@ -1,10 +1,13 @@
 "use client";
 import SectionContent from "./SectionContent";
 import { motion } from "framer-motion";
+import {
+  AnyDukungContent,
+  DukungDefault,
+  RichTextBlock,
+  RichTextChild,
+} from "@/services/types/dukung";
 
-/* ─────────────────────────────────────────────
-   Animation helpers
-───────────────────────────────────────────── */
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
 const fadeUp = {
@@ -12,58 +15,65 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
 };
 
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.11, delayChildren: 0.05 } },
-};
-
 const VP = { once: true, margin: "-60px" };
 
-const BODY_TEXT = `
-<ul>
-  <li>
-    <strong>Dukung Literasi dan Advokasi Kami</strong>
-    Setiap artikel, laporan, dan data yang kami publikasikan adalah hasil riset mendalam untuk melawan misinformasi. Dengan mendukung Aura Mahakam, Anda membantu kami terus menelusuri jejak kerusakan, memverifikasi data, dan menyajikan narasi yang berpihak pada keadilan ekologis.
-  </li>
+// ─── Rich Text renderer ───────────────────────────────────────────────────────
+function renderChildren(children: RichTextChild[]): string {
+  return children
+    .map((child) => {
+      if (child.type === "text") {
+        const text = child.text ?? "";
+        return child.bold ? `<strong>${text}</strong>` : text;
+      }
+      if (child.type === "list-item" && child.children) {
+        return `<li>${renderChildren(child.children)}</li>`;
+      }
+      return "";
+    })
+    .join("");
+}
 
-  <li>
-    <strong>Sebarkan Kesadaran</strong>
-    Krisis ini tidak bisa diselesaikan sendirian. Bagikan tulisan kami, diskusikan isu Mahakam di komunitas Anda, dan tantang narasi pembangunan yang mengabaikan lingkungan. Semakin banyak suara yang bersatu, semakin sulit bagi para perusak untuk bertindak tanpa akuntabilitas.
-  </li>
+function renderRichText(blocks: RichTextBlock[]): string {
+  return blocks
+    .map((block) => {
+      if (block.type === "list") {
+        const tag = block.format === "ordered" ? "ol" : "ul";
+        return `<${tag}>${renderChildren(block.children)}</${tag}>`;
+      }
+      if (block.type === "paragraph") {
+        return `<p>${renderChildren(block.children)}</p>`;
+      }
+      return "";
+    })
+    .join("");
+}
 
-  <li>
-    <strong>Terlibat dalam Aksi Nyata</strong>
-    Kami tidak hanya menulis; kami mendorong aksi. Ikuti kampanye kami untuk mendesak moratorium izin baru di DAS Mahakam, percepat pengakuan hak Masyarakat Adat, dan reformasi tata kelola lahan.
-  </li>
+// ─── Component ───────────────────────────────────────────────────────────────
 
-  <li>
-    <strong>Berkontribusi Secara Finansial</strong>
-    Independensi adalah nyawa kami. Dukungan finansial dari Anda memastikan bahwa kami tetap bebas dari tekanan korporasi dan dapat fokus pada investigasi yang jujur.
-  </li>
-</ul>
-`;
-export default function AksiLayout() {
+export default function AksiLayout({ data }: { data: AnyDukungContent }) {
+  const d = data as DukungDefault;
+  const bodyHtml = renderRichText(d.content ?? []);
+
+  // Debug: log the generated HTML
   return (
     <>
       <SectionContent>
         <div className="max-w-[1400px] mx-auto z-0 relative px-6">
           <div className="bg-white rounded-[30px] px-6 py-12 md:px-10 md:py-16 lg:px-16 lg:py-20 flex flex-col gap-6">
-            {/* ── Headline ────────────────────── */}
             <h2
-              className="font-staatliches  text-black max-w-[700px] whitespace-pre-line"
+              className="font-staatliches text-black max-w-[700px] whitespace-pre-line"
               style={{ fontSize: "clamp(40px, 5vw, 64px)", lineHeight: 1 }}
             >
-              Daftarkan Aksi Kamu
+              {d.title}
             </h2>
             <p className="font-jakarta text-2xl leading-8 font-bold text-black">
-              Formulir Aura Mahakam
+              {d.subtitle}
             </p>
             <span className="font-jakarta text-base leading-6 text-black">
-              Daftakan aksi dan kegiatan yang mendukung gerakan landskap
-              mahakam.
+              {d.summary}
             </span>
             <motion.a
-              href="https://docs.google.com/forms/u/0/"
+              href={d.link}
               target="_blank"
               whileHover={{ scale: 1.02, opacity: 0.92 }}
               whileTap={{ scale: 0.97 }}
@@ -79,7 +89,6 @@ export default function AksiLayout() {
 
       <section className="w-full bg-[#F7F7F7]">
         <div className="max-w-[1400px] mx-auto px-6 py-16 md:py-20 lg:py-24 flex flex-col gap-12 lg:gap-16">
-          {/* ── Title 1 ───────────────────────────── */}
           <motion.h2
             variants={fadeUp}
             initial="hidden"
@@ -88,25 +97,13 @@ export default function AksiLayout() {
             className="font-staatliches text-black whitespace-pre-line max-w-[670px]"
             style={{ fontSize: "clamp(40px, 5vw, 64px)", lineHeight: 1.05 }}
           >
-            Bagaimana Kamu Bisa Membantu?
+            {d.title_section}
           </motion.h2>
 
-          {/* ── Body text + Note ──────────────────── */}
           <motion.div variants={fadeUp}>
             <div
-              className="
-                petisi-content
-                font-jakarta
-                text-base
-                leading-8
-                text-black
-                columns-1
-                md:columns-2
-                gap-12
-              "
-              dangerouslySetInnerHTML={{
-                __html: BODY_TEXT,
-              }}
+              className="petisi-content prose prose-base max-w-none font-jakarta text-black columns-1 md:columns-2 gap-12"
+              dangerouslySetInnerHTML={{ __html: bodyHtml }}
             />
           </motion.div>
         </div>

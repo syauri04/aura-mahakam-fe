@@ -1,6 +1,6 @@
 export const kegiatanData = {
-  festival: {
-    slug: "festival",
+  "festival-aura-mahakam": {
+    slug: "festival-aura-mahakam",
     title: "Festival Aura Mahakam",
     summary:
       "Festival Aura Mahakam adalah perayaan budaya dan aksi generasi muda yang menjadi bagian dari kampanye Lanskap Mahakam.",
@@ -8,7 +8,7 @@ export const kegiatanData = {
 
 Lebih dari sekadar acara, Festival Aura Mahakam merupakan momentum transformasi, tempat kearifan lokal bertemu dengan semangat perlawanan modern. Festival ini menegaskan bahwa masa depan hutan, sungai, dan masyarakat yang hidup di sekitar Mahakam berada di tangan kita bersama — untuk dijaga, dirayakan, dan dipertahankan.`,
     countdown: "2026-06-15",
-    layout: "festival",
+    layout: "festival-aura-mahakam",
   },
   "mahakam-heroes": {
     slug: "mahakam-heroes",

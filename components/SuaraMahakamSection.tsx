@@ -9,38 +9,16 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, A11y } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
+import { ContentSuaraItem } from "@/services/types/suara";
+import { getStrapiImageUrl } from "@/services/strapi";
 
-const articles = [
-  {
-    image: "/assets/suara1.jpg",
-    title:
-      "Benua Etam di Persimpangan: Menelusuri Dualisme Hulu dan Hilir Kalimantan Timur",
-    href: "/suara/1",
-  },
-  {
-    image: "/assets/suara2.jpg",
-    title:
-      "Mahakam di Persimpangan: Ketika Sungai yang Hidup Berjuang untuk Bernafas",
-    href: "/suara/2",
-  },
-  {
-    image: "/assets/suara3.jpg",
-    title: 'Siaran Pers: Festival "Aura Mahakam" Dorong Peran Generasi Muda',
-    href: "/suara/3",
-  },
-  {
-    image: "/assets/suara1.jpg",
-    title: "Masyarakat Adat dan Tantangan Perubahan Iklim di Mahakam",
-    href: "/suara/4",
-  },
-  {
-    image: "/assets/suara2.jpg",
-    title: "Lanskap Mahakam: Warisan Alam yang Harus Dijaga Bersama",
-    href: "/suara/5",
-  },
-];
+interface SuaraMahakamSectionProps {
+  data: ContentSuaraItem[];
+}
 
-export default function SuaraMahakamSection() {
+export default function SuaraMahakamSection({
+  data,
+}: SuaraMahakamSectionProps) {
   const swiperRef = useRef<SwiperType | null>(null);
 
   return (
@@ -105,7 +83,7 @@ export default function SuaraMahakamSection() {
           }}
           className="!px-6 md:!px-16 !items-stretch"
         >
-          {articles.map((article, i) => (
+          {data.map((article, i) => (
             <SwiperSlide key={i} className="h-auto self-stretch">
               <motion.div
                 initial={{ opacity: 0, y: 40 }}
@@ -114,12 +92,23 @@ export default function SuaraMahakamSection() {
                 transition={{ duration: 0.5, delay: i * 0.08 }}
                 className="h-full"
               >
-                <Link href={article.href} className="no-underline block h-full">
+                <Link
+                  href={
+                    article.type === "cerita-mahakam"
+                      ? `/suara-mahakam/cerita-mahakam-heroes/${article.slug}`
+                      : `/suara-mahakam/kabar-mahakam/${article.slug}`
+                  }
+                  className="no-underline block h-full"
+                >
                   <div className="bg-white/60 rounded-[30px] overflow-hidden flex flex-col h-full">
                     {/* Image */}
                     <div className="relative h-[320px] shrink-0">
                       <Image
-                        src={article.image}
+                        src={getStrapiImageUrl(
+                          article.cover_image?.formats?.medium?.url ??
+                            article.cover_image?.url ??
+                            null,
+                        )}
                         alt={article.title}
                         fill
                         sizes="(max-width: 768px) 100vw,

@@ -3,40 +3,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
-
 import { useRef } from "react";
 import YoutubeEmbed from "./YoutubeEmbed";
+import { CardKegiatan } from "@/services/types/home";
 
-const cards = [
-  {
-    image: "/assets/kegiatan01.jpg",
-    title: "Dukung Gerakan Melindungi Lanskap Mahakam",
-    buttonLabel: "Cari Tau Caranya",
-    buttonClass: "bg-[#10BB82]",
-    href: "/kegiatan/festival",
-  },
-  {
-    image: "/assets/kegiatan02.png",
-    title: "Jadi Mahakam Heroes",
-    buttonLabel: "Gabung Sekarang",
-    buttonClass: "bg-teal",
-    href: "/kegiatan/heroes",
-  },
-];
-const MotionLink = motion(Link);
-// Ganti dengan YouTube Video ID sebenarnya
-const YOUTUBE_VIDEO_ID = "jUSIMie57u0";
+interface Props {
+  cards: CardKegiatan[];
+  youtubeId: string;
+}
 
-function KegiatanCard({
-  card,
-  index,
-}: {
-  card: (typeof cards)[0];
-  index: number;
-}) {
+const MotionLink = motion.create(Link);
+
+function KegiatanCard({ card, index }: { card: CardKegiatan; index: number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
-
+  console.log(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}${card.image?.formats?.large?.url}`,
+  );
   return (
     <motion.div
       ref={ref}
@@ -58,8 +41,12 @@ function KegiatanCard({
           className="absolute inset-0"
         >
           <Image
-            src={card.image}
-            alt={card.title}
+            src={
+              card.image
+                ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${card.image.formats.large?.url ?? card.image.url}`
+                : `/assets/kegiatan0${index + 1}.${index === 0 ? "jpg" : "png"}`
+            }
+            alt={card.image?.alternativeText ?? card.title}
             fill
             sizes="(max-width: 768px) 100vw,
             (max-width: 1024px) 50vw,
@@ -81,13 +68,11 @@ function KegiatanCard({
               boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
             }}
             whileTap={{ scale: 0.96 }}
-            href={card.href}
-            className={[
-              card.buttonClass,
-              "inline-block rounded-full font-jakarta font-bold text-base leading-4 text-black px-10 py-5 no-underline transition-opacity hover:opacity-90",
-            ].join(" ")}
+            href={card.button_link}
+            style={{ backgroundColor: card.button_colors }}
+            className="inline-block rounded-full font-jakarta font-bold text-base leading-4 text-black px-10 py-5 no-underline transition-opacity hover:opacity-90"
           >
-            {card.buttonLabel}
+            {card.button_text}
           </MotionLink>
         </div>
       </div>
@@ -95,7 +80,7 @@ function KegiatanCard({
   );
 }
 
-export default function KegiatanSection() {
+export default function KegiatanSection({ cards, youtubeId }: Props) {
   return (
     <section className="bg-purple-neon pt-18 flex flex-col gap-10">
       {/* Title */}
@@ -111,17 +96,17 @@ export default function KegiatanSection() {
         </motion.h2>
       </div>
 
-      {/* Cards grid — has side padding */}
+      {/* Cards grid */}
       <div className="w-full max-w-[1400px] mx-auto px-6">
-        <div className=" grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {cards.map((card, i) => (
-            <KegiatanCard key={card.title} card={card} index={i} />
+            <KegiatanCard key={card.id} card={card} index={i} />
           ))}
         </div>
       </div>
 
-      {/* Video — full width, no side padding */}
-      <YoutubeEmbed videoId={YOUTUBE_VIDEO_ID} />
+      {/* Video */}
+      <YoutubeEmbed videoId={youtubeId} />
     </section>
   );
 }

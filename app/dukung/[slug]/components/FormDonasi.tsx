@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getToken, loginWithGoogle, removeToken } from "@/lib/auth";
 
 /* ─────────────────────────────────────────────
    Types & Constants
@@ -141,6 +142,14 @@ interface FormDonasiProps {
   }) => void;
 }
 
+declare global {
+  interface Window {
+    snap?: {
+      pay: (token: string, options?: Record<string, unknown>) => void;
+    };
+  }
+}
+
 export default function FormDonasi({
   headline = "MASA DEPAN LANSKAP MAHAKAM\nBERGANTUNG PADA\nKITA SEMUA",
   leftTitle = "Jangan Biarkan Mahakam Menjadi Kenangan.",
@@ -164,14 +173,75 @@ export default function FormDonasi({
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    onSubmit?.({
-      nominal: selectedOption?.value ?? null,
-      customNominal: form.customNominal,
-      nama: form.nama,
-      email: form.email,
-      noTelp: form.noTelp,
+
+    const token = getToken();
+
+    if (!token) {
+      loginWithGoogle();
+      return;
+    }
+    const selectedOption = NOMINAL_OPTIONS.find(
+      (option) => option.id === selectedNominal,
+    );
+
+    const amount =
+      selectedNominal === "custom"
+        ? Number(form.customNominal)
+        : selectedOption?.value;
+
+    if (!amount || amount < 1000) {
+      alert("Nominal donasi tidak valid.");
+      return;
+    }
+    const formData = new FormData(e.currentTarget);
+
+    const res = await fetch("/api/donasi/snap", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount,
+        name: form.nama,
+        email: form.email,
+        phone: form.noTelp,
+        message: "",
+      }),
+    });
+
+    if (res.status === 401) {
+      removeToken();
+      loginWithGoogle();
+      return;
+    }
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(
+        `${data.message}\n\nStatus: ${data.status ?? "-"}\nDetail: ${
+          data.detail ?? "-"
+        }`,
+      );
+      return;
+    }
+
+    window.snap?.pay(data.token, {
+      onSuccess: function () {
+        alert("Pembayaran berhasil. Terima kasih!");
+      },
+      onPending: function () {
+        alert("Pembayaran menunggu penyelesaian.");
+      },
+      onError: function () {
+        alert("Pembayaran gagal.");
+      },
+      onClose: function () {
+        alert("Kamu menutup popup pembayaran.");
+      },
     });
   }
 

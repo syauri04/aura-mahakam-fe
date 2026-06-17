@@ -1,38 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  formatPlain,
-  formatThousands,
-  formatK,
-} from "@/app/dukung/[slug]/data/formatters";
+import { autoFormat } from "@/app/dukung/[slug]/data/formatters";
 import StatCard from "./StatCard";
 // import { formatPlain, formatThousands, formatK } from "./formatters";
 
 /* ─────────────────────────────────────────────
    Data
 ───────────────────────────────────────────── */
-const STATS = [
-  {
-    targetValue: 100,
-    label: "Relawan",
-    format: formatPlain,
-    duration: 1.8,
-  },
-  {
-    targetValue: 1000,
-    label: "Donatur",
-    format: formatThousands,
-    duration: 2,
-  },
-  {
-    targetValue: 10200,
-    label: "Pendukung Petisi",
-    format: formatK,
-    duration: 2.2,
-  },
-] as const;
-
+interface DukungCountProps {
+  relawan: string;
+  donatur: string;
+  pendukung_petisi: string;
+}
 /* ─────────────────────────────────────────────
    Animation
 ───────────────────────────────────────────── */
@@ -59,7 +39,32 @@ const cardReveal = {
 /* ─────────────────────────────────────────────
    Component
 ───────────────────────────────────────────── */
-export default function DukungCount() {
+export default function DukungCount({
+  relawan,
+  donatur,
+  pendukung_petisi,
+}: DukungCountProps) {
+  const stats = [
+    {
+      targetValue: Number(relawan),
+      label: "Relawan",
+      format: autoFormat,
+      duration: 1.8,
+    },
+    {
+      targetValue: Number(donatur),
+      label: "Donatur",
+      format: autoFormat,
+      duration: 2,
+    },
+    {
+      targetValue: Number(pendukung_petisi),
+      label: "Pendukung Petisi",
+      format: autoFormat,
+      duration: 2.2,
+    },
+  ];
+
   return (
     <motion.div
       variants={staggerContainer}
@@ -68,7 +73,7 @@ export default function DukungCount() {
       viewport={{ once: true, margin: "-60px" }}
       className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6"
     >
-      {STATS.map((stat) => (
+      {stats.map((stat) => (
         <motion.div key={stat.label} variants={cardReveal}>
           <StatCard
             targetValue={stat.targetValue}

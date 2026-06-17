@@ -1,30 +1,40 @@
 import TitleBreadcrumb from "@/components/Hero/child/TitleBreadcrumb";
 import HeroContentPages from "@/components/Hero/HeroContentPages";
 import HeroSection from "@/components/HeroSection";
-import { suaraData } from "./data/suara";
 import { notFound as nextNotFound } from "next/navigation";
 import Summary from "@/components/Hero/child/Summary";
 import KabarLayout from "./components/KabarLayout";
 import CeritaLayout from "./components/CeritaLayout";
 import SectionInfoSuara from "./components/SectionInfoSuara";
+import { fetchSuara } from "@/services/suara";
+import { CategorySuara } from "@/services/types/suara";
 
-const layoutMap = {
-  "cerita-mahakam": CeritaLayout,
+const layoutMap: Record<string, React.ComponentType> = {
+  "cerita-mahakam-heroes": CeritaLayout,
   "kabar-mahakam": KabarLayout,
 };
 
 export default async function SuaraPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ category: string }>;
+  searchParams: Promise<{ lang?: string }>;
 }) {
-  const { category } = await params;
+  const [{ category }, { lang }] = await Promise.all([params, searchParams]);
+  const locale = lang === "en" ? "en" : "id";
 
-  const data = suaraData[category as keyof typeof suaraData];
+  const [suara] = await Promise.all([fetchSuara(locale)]);
 
-  if (!data) notFound();
+  const hero = suara.hero[0];
 
-  const BottomLayout = layoutMap[data.layout as keyof typeof layoutMap];
+  const categoryData: CategorySuara | undefined = suara.category_suara.find(
+    (c) => c.slug === category,
+  );
+
+  if (!categoryData) nextNotFound();
+
+  const BottomLayout = layoutMap[category];
 
   return (
     <>
@@ -32,18 +42,19 @@ export default async function SuaraPage({
         <HeroContentPages>
           <TitleBreadcrumb
             items={[{ label: "Home", href: "/" }, { label: "Suara Mahakam" }]}
-            title="Suara Mahakam"
+            title={hero?.title ?? "Suara Mahakam"}
           />
           <Summary
-            highlight="
-              Ruang bersama untuk mendengar cerita, mengikuti perkembangan, dan memperkuat gerakan menjaga Lanskap Mahakam.
-              "
+            highlight={hero?.summary ?? "Suara Mahakam"}
             description=""
           />
         </HeroContentPages>
       </HeroSection>
-      <SectionInfoSuara data={data} />
-      <BottomLayout />
+      <SectionInfoSuara
+        data={categoryData!}
+        categories={suara.category_suara}
+      />
+      {BottomLayout ? <BottomLayout /> : null}
     </>
   );
 }

@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Staatliches, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-
+import LayoutWrapper from "@/components/LayoutWrapper";
 const staatliches = Staatliches({
   variable: "--font-staatliches",
   subsets: ["latin"],
@@ -36,9 +34,7 @@ export default function RootLayout({
       className={`${staatliches.variable} ${plusJakartaSans.variable}`}
     >
       <body className="min-h-full flex flex-col antialiased">
-        <Header />
-        {children}
-        <Footer />
+        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
   );

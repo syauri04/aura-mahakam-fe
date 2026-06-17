@@ -6,9 +6,8 @@ interface AlertCardProps {
   imageAlt?: string;
   title: string;
   summary: string;
-  /** URL untuk tombol "Ikut Beraksi" */
+  petisiHref?: string;
   actionHref: string;
-  /** Label tombol (default: "Ikut Beraksi") */
   actionLabel?: string;
 }
 
@@ -17,6 +16,7 @@ export default function AlertCard({
   imageAlt = "alert image",
   title,
   summary,
+  petisiHref = "#",
   actionHref,
   actionLabel = "Ikut Beraksi",
 }: AlertCardProps) {
@@ -28,41 +28,43 @@ export default function AlertCard({
         boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.1)",
       }}
     >
-      {/* ── Image ────────────────────────────────
-          Mobile  : full width, fixed height 220px
-          sm+     : fixed square 325×325, shrink-0
-      ─────────────────────────────────────────── */}
-      <div className="relative w-full h-[220px] sm:w-[325px] sm:h-auto sm:aspect-square shrink-0">
+      {/* Image — link ke detail */}
+      <Link
+        href={petisiHref}
+        className="relative w-full h-[220px] sm:w-[325px] sm:h-auto sm:aspect-square shrink-0 block overflow-hidden group"
+      >
         <Image
           src={imageSrc}
           alt={imageAlt}
           fill
-          className="object-cover rounded-[10px]"
-          sizes="(max-width: 640px) 100vw, 325px "
+          className="object-cover rounded-[10px] transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, 325px"
         />
-      </div>
+      </Link>
 
-      {/* ── Text Content ─────────────────────── */}
+      {/* Text Content */}
       <div className="flex flex-col justify-between gap-4 p-5 sm:p-6 flex-1">
         <div className="flex flex-col gap-3">
-          {/* Title */}
-          <h3
-            className="font-jakarta font-bold text-black"
+          {/* Title — link ke detail dengan underline on hover */}
+          <Link
+            href={petisiHref}
+            className="font-jakarta font-bold text-black hover:underline underline-offset-2 no-underline transition-all"
             style={{ fontSize: "24px", lineHeight: "32px" }}
           >
             {title}
-          </h3>
+          </Link>
 
-          {/* Summary */}
           <p className="font-jakarta text-base leading-6 text-black">
             {summary}
           </p>
         </div>
 
-        {/* CTA Button */}
+        {/* CTA Button — link ke link_petisi external */}
         <div>
           <Link
             href={actionHref}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-block font-jakarta text-base leading-none text-white font-semibold px-6 py-3 rounded-full transition-opacity duration-200 hover:opacity-85"
             style={{ backgroundColor: "#00C4B4" }}
           >

@@ -51,6 +51,7 @@ interface AlertItem {
   imageAlt?: string;
   title: string;
   summary: string;
+  petisiHref: string;
   actionHref: string;
   actionLabel?: string;
 }
@@ -135,6 +136,7 @@ export default function SectionListPetisi({
                     imageAlt={item.imageAlt}
                     title={item.title}
                     summary={item.summary}
+                    petisiHref={item.petisiHref}
                     actionHref={item.actionHref}
                     actionLabel={item.actionLabel}
                   />
