@@ -28,7 +28,10 @@ const navItems = {
       label: "KEGIATAN",
       href: "#",
       children: [
-        { label: "Festival Aura Mahakam", href: "/kegiatan/festival" },
+        {
+          label: "Festival Aura Mahakam",
+          href: "/kegiatan/festival-aura-mahakam",
+        },
         { label: "Mahakam Heroes", href: "/kegiatan/mahakam-heroes" },
       ],
     },
@@ -60,7 +63,10 @@ const navItems = {
       label: "ACTIVITIES",
       href: "#",
       children: [
-        { label: "Aura Mahakam Festival", href: "/kegiatan/festival" },
+        {
+          label: "Aura Mahakam Festival",
+          href: "/kegiatan/festival-aura-mahakam",
+        },
         { label: "Mahakam Heroes", href: "/kegiatan/mahakam-heroes" },
       ],
     },

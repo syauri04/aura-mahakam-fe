@@ -34,7 +34,7 @@ export default async function KegiatanPage({
   const kegiatan = await fetchKegiatan(locale);
   const activeData = findSubKegiatanBySlug(kegiatan.sub_kegiatan, slug);
   // Debug log to check the found data
-  console.log("Active Data:", activeData);
+
   if (!activeData) nextNotFound();
 
   const BottomLayout = layoutMap[activeData!.__component];
