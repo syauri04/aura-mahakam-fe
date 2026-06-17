@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -19,7 +20,11 @@ export default function LayoutWrapper({
 
   return (
     <>
-      {!hideLayout && <Header />}
+      {!hideLayout && (
+        <Suspense fallback={null}>
+          <Header />
+        </Suspense>
+      )}
 
       {children}
 

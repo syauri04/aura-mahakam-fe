@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { saveToken } from "@/lib/auth";
 import Link from "next/link";
@@ -8,6 +8,20 @@ import Link from "next/link";
 const STRAPI_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function GoogleCallback() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center font-jakarta">
+          <p className="text-black">Memproses login...</p>
+        </div>
+      }
+    >
+      <GoogleCallbackContent />
+    </Suspense>
+  );
+}
+
+function GoogleCallbackContent() {
   const searchParams = useSearchParams();
   const access_token = searchParams.get("access_token");
   const [errorMsg, setErrorMsg] = useState("");
