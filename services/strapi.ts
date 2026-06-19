@@ -9,7 +9,7 @@ export async function fetchFromStrapi<T>(
   endpoint: string,
   options: FetchOptions = {},
 ): Promise<T> {
-  const { locale, revalidate = 5 } = options;
+  const { locale, revalidate = 0 } = options;
 
   const localeParam = locale ? `locale=${locale}` : "";
   const separator = endpoint.includes("?") ? "&" : "?";
