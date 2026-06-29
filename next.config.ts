@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "kabeja.id",
+        hostname: "cms.auramahakam.org",
         pathname: "/uploads/**",
       },
       {
