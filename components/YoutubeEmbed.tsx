@@ -6,6 +6,7 @@ import { Play } from "lucide-react";
 
 export default function YoutubeEmbed({ videoId }: { videoId: string }) {
   const [playing, setPlaying] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   return (
     <div className="relative w-full h-[400px] md:h-[640px] overflow-hidden">
@@ -13,11 +14,15 @@ export default function YoutubeEmbed({ videoId }: { videoId: string }) {
         <>
           {/* Thumbnail */}
           <Image
-            src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+            src={`https://img.youtube.com/vi/${videoId}/${
+              failed ? "hqdefault.jpg" : "maxresdefault.jpg"
+            }`}
             alt="Video thumbnail"
             fill
             className="object-cover"
+            onError={() => setFailed(true)}
           />
+
           {/* Dark overlay */}
           <div className="absolute inset-0 bg-black/40" />
           {/* Play button */}

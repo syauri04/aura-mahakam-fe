@@ -1,12 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getToken, loginWithGoogle, removeToken } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
-/* ─────────────────────────────────────────────
-   Types & Constants
-───────────────────────────────────────────── */
+const EASE = [0.25, 0.1, 0.25, 1] as const;
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+};
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.11, delayChildren: 0.05 } },
+};
+
+const VP = { once: true, margin: "-60px" };
+
 const NOMINAL_OPTIONS = [
   { id: "50k", label: "Rp50.000", value: 50000 },
   { id: "100k", label: "Rp100.000", value: 100000 },
@@ -23,9 +35,14 @@ interface FormState {
   customNominal: string;
 }
 
-/* ─────────────────────────────────────────────
-   Sub-components
-───────────────────────────────────────────── */
+interface FormErrors {
+  nama?: string;
+  email?: string;
+  noTelp?: string;
+  customNominal?: string;
+}
+
+// ─── RadioOption ──────────────────────────────────────────────────────────────
 function RadioOption({
   id,
   label,
@@ -42,14 +59,8 @@ function RadioOption({
       htmlFor={id}
       className="flex items-center gap-2 cursor-pointer select-none group"
     >
-      {/* Custom radio circle */}
       <span
-        className={`
-          relative flex items-center justify-center
-          w-5 h-5 rounded-full border-2 shrink-0
-          transition-colors duration-200
-          ${checked ? "border-[#00C4B4]" : "border-[#AAAAAA] group-hover:border-[#00C4B4]"}
-        `}
+        className={`relative flex items-center justify-center w-5 h-5 rounded-full border-2 shrink-0 transition-colors duration-200 ${checked ? "border-[#00C4B4]" : "border-[#AAAAAA] group-hover:border-[#00C4B4]"}`}
       >
         {checked && (
           <motion.span
@@ -77,6 +88,7 @@ function RadioOption({
   );
 }
 
+// ─── FormField ────────────────────────────────────────────────────────────────
 function FormField({
   label,
   id,
@@ -84,6 +96,8 @@ function FormField({
   placeholder,
   value,
   onChange,
+  error,
+  required,
 }: {
   label: string;
   id: string;
@@ -91,6 +105,8 @@ function FormField({
   placeholder?: string;
   value: string;
   onChange: (v: string) => void;
+  error?: string;
+  required?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -99,6 +115,7 @@ function FormField({
         className="font-jakarta text-base leading-6 text-black font-medium"
       >
         {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       <input
         id={id}
@@ -106,56 +123,37 @@ function FormField({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="
-          w-full bg-[#F2F2F2] rounded-[8px]
-          px-4 py-3.5
-          font-jakarta text-base leading-6 text-black
-          placeholder:text-[#AAAAAA]
-          outline-none
-          focus:ring-2 focus:ring-[#00C4B4]/40
-          transition-shadow duration-200
-        "
+        className={`w-full bg-[#F2F2F2] rounded-[8px] px-4 py-3.5 font-jakarta text-base leading-6 text-black placeholder:text-[#AAAAAA] outline-none transition-shadow duration-200 ${
+          error ? "ring-2 ring-red-400" : "focus:ring-2 focus:ring-[#00C4B4]/40"
+        }`}
       />
+      {error && <p className="font-jakarta text-sm text-red-500">{error}</p>}
     </div>
   );
 }
 
-/* ─────────────────────────────────────────────
-   Main Section
-───────────────────────────────────────────── */
+// ─── Types ────────────────────────────────────────────────────────────────────
+export interface FeatureItem {
+  title: string;
+  summary: string;
+}
+
 interface FormDonasiProps {
-  /** Override teks judul besar (opsional) */
-  headline?: string;
-  /** Override kolom deskripsi kiri */
-  leftTitle?: string;
-  leftSummary?: string;
-  /** Override kolom deskripsi kanan */
-  rightTitle?: string;
-  rightSummary?: string;
-  /** Handler submit form */
-  onSubmit?: (data: {
-    nominal: number | null;
-    customNominal: string;
-    nama: string;
-    email: string;
-    noTelp: string;
-  }) => void;
+  title?: string;
+  features: FeatureItem[];
+  onSubmit?: (data: { nama: string; email: string; noTelp: string }) => void;
 }
 
 declare global {
   interface Window {
-    snap?: {
-      pay: (token: string, options?: Record<string, unknown>) => void;
-    };
+    snap?: { pay: (token: string, options?: Record<string, unknown>) => void };
   }
 }
 
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function FormDonasi({
-  headline = "MASA DEPAN LANSKAP MAHAKAM\nBERGANTUNG PADA\nKITA SEMUA",
-  leftTitle = "Jangan Biarkan Mahakam Menjadi Kenangan.",
-  leftSummary = "Masa depan sungai ini ada di tangan kita. Apakah kita akan membiarkannya menjadi sekadar catatan sejarah tentang kehancuran, ataukah kita akan berjuang untuk memulihkannya? Pilihan ada di tangan Anda.",
-  rightTitle = "Dukung Gerakan Aura Mahakam sekarang.",
-  rightSummary = "Mari bersama-sama memastikan bahwa Mahakam tetap menjadi nadi kehidupan, bukan kuburan bagi keanekaragaman hayati dan keadilan sosial.",
+  title,
+  features,
   onSubmit,
 }: FormDonasiProps) {
   const [selectedNominal, setSelectedNominal] = useState<NominalId>("50k");
@@ -165,125 +163,179 @@ export default function FormDonasi({
     noTelp: "",
     customNominal: "",
   });
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [loading, setLoading] = useState(false);
+  const [userLoaded, setUserLoaded] = useState(false);
 
+  const router = useRouter();
   const isCustom = selectedNominal === "custom";
-  const selectedOption = NOMINAL_OPTIONS.find((o) => o.id === selectedNominal);
+
+  // ── Auto-fill dari user yang sudah login ──────────────────────────────────
+  useEffect(() => {
+    const token = getToken();
+    if (!token) return;
+
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.id) {
+          setForm((prev) => ({
+            ...prev,
+            nama: data.username ?? prev.nama,
+            email: data.email ?? prev.email,
+          }));
+          setUserLoaded(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   function setField<K extends keyof FormState>(key: K, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
+    // Clear error saat user mulai isi
+    if (errors[key]) {
+      setErrors((prev) => ({ ...prev, [key]: undefined }));
+    }
   }
 
+  // ── Validasi ─────────────────────────────────────────────────────────────
+  function validate(): boolean {
+    const newErrors: FormErrors = {};
+
+    if (!form.nama.trim()) {
+      newErrors.nama = "Nama tidak boleh kosong";
+    }
+
+    if (!form.email.trim()) {
+      newErrors.email = "Email tidak boleh kosong";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = "Format email tidak valid";
+    }
+
+    if (!form.noTelp.trim()) {
+      newErrors.noTelp = "Nomor telepon tidak boleh kosong";
+    } else if (!/^[0-9+\-\s]{8,15}$/.test(form.noTelp)) {
+      newErrors.noTelp = "Format nomor telepon tidak valid";
+    }
+
+    if (isCustom) {
+      if (!form.customNominal.trim()) {
+        newErrors.customNominal = "Nominal donasi tidak boleh kosong";
+      } else if (Number(form.customNominal) < 1000) {
+        newErrors.customNominal = "Nominal minimal Rp1.000";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
+  // ── Submit ────────────────────────────────────────────────────────────────
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const token = getToken();
+    if (!validate()) return;
 
+    const token = getToken();
     if (!token) {
-      loginWithGoogle();
+      router.push("/login");
       return;
     }
-    const selectedOption = NOMINAL_OPTIONS.find(
-      (option) => option.id === selectedNominal,
-    );
 
-    const amount =
-      selectedNominal === "custom"
-        ? Number(form.customNominal)
-        : selectedOption?.value;
+    const selectedOption = NOMINAL_OPTIONS.find(
+      (o) => o.id === selectedNominal,
+    );
+    const amount = isCustom
+      ? Number(form.customNominal)
+      : selectedOption?.value;
 
     if (!amount || amount < 1000) {
-      alert("Nominal donasi tidak valid.");
-      return;
-    }
-    const formData = new FormData(e.currentTarget);
-
-    const res = await fetch("/api/donasi/snap", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        amount,
-        name: form.nama,
-        email: form.email,
-        phone: form.noTelp,
-        message: "",
-      }),
-    });
-
-    if (res.status === 401) {
-      removeToken();
-      loginWithGoogle();
+      setErrors((prev) => ({ ...prev, customNominal: "Nominal tidak valid" }));
       return;
     }
 
-    const data = await res.json();
+    setLoading(true);
+    try {
+      const res = await fetch("/api/donasi/snap", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount,
+          name: form.nama,
+          email: form.email,
+          phone: form.noTelp,
+          message: "",
+        }),
+      });
 
-    if (!res.ok) {
-      alert(
-        `${data.message}\n\nStatus: ${data.status ?? "-"}\nDetail: ${
-          data.detail ?? "-"
-        }`,
-      );
-      return;
+      if (res.status === 401) {
+        removeToken();
+        router.push("/login");
+        return;
+      }
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(
+          `${data.message}\n\nStatus: ${data.status ?? "-"}\nDetail: ${data.detail ?? "-"}`,
+        );
+        return;
+      }
+
+      window.snap?.pay(data.token, {
+        onSuccess: () => alert("Pembayaran berhasil. Terima kasih!"),
+        onPending: () => alert("Pembayaran menunggu penyelesaian."),
+        onError: () => alert("Pembayaran gagal."),
+        onClose: () => alert("Kamu menutup popup pembayaran."),
+      });
+    } finally {
+      setLoading(false);
     }
-
-    window.snap?.pay(data.token, {
-      onSuccess: function () {
-        alert("Pembayaran berhasil. Terima kasih!");
-      },
-      onPending: function () {
-        alert("Pembayaran menunggu penyelesaian.");
-      },
-      onError: function () {
-        alert("Pembayaran gagal.");
-      },
-      onClose: function () {
-        alert("Kamu menutup popup pembayaran.");
-      },
-    });
   }
 
   return (
     <section className="w-full">
       <div className="max-w-[1400px] mx-auto z-0 relative px-6">
         <div className="bg-white rounded-[30px] px-6 py-12 md:px-10 md:py-16 lg:px-16 lg:py-20 flex flex-col gap-10">
-          {/* ── Headline ────────────────────── */}
           <h2
-            className="font-staatliches  text-black max-w-[700px] whitespace-pre-line"
+            className="font-staatliches text-black max-w-[700px] whitespace-pre-line"
             style={{ fontSize: "clamp(40px, 5vw, 64px)", lineHeight: 1 }}
           >
-            {headline}
+            {title}
           </h2>
 
-          {/* ── 2-column description ─────────── */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-            {/* Left */}
-            <div className="flex flex-col gap-3">
-              <h3 className="font-jakarta font-bold text-2xl leading-8 text-black">
-                {leftTitle}
-              </h3>
-              <p className="font-jakarta text-base leading-6 text-black">
-                {leftSummary}
-              </p>
-            </div>
-            {/* Right */}
-            <div className="flex flex-col gap-3">
-              <h3 className="font-jakarta font-bold text-2xl leading-8 text-black">
-                {rightTitle}
-              </h3>
-              <p className="font-jakarta text-base leading-6 text-black">
-                {rightSummary}
-              </p>
-            </div>
-          </div>
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={VP}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10"
+          >
+            {features.map((item) => (
+              <motion.div
+                key={item.title}
+                variants={fadeUp}
+                className="flex flex-col gap-3"
+              >
+                <h3 className="font-jakarta font-bold text-black text-2xl leading-8">
+                  {item.title}
+                </h3>
+                <p className="font-jakarta text-base leading-6 text-black">
+                  {item.summary}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
 
-          {/* ── Donasi Form ──────────────────── */}
           <div className="flex flex-col gap-6">
-            {/* Title DONASI */}
             <h2
-              className="font-staatliches  text-black py-6"
+              className="font-staatliches text-black py-6"
               style={{ fontSize: "clamp(40px, 5vw, 64px)", lineHeight: 1 }}
             >
               DONASI
@@ -292,8 +344,9 @@ export default function FormDonasi({
             <form
               onSubmit={handleSubmit}
               className="flex flex-col gap-10 lg:w-[50%]"
+              noValidate
             >
-              {/* ── Radio Nominal ─────────────── */}
+              {/* Nominal */}
               <div className="flex flex-wrap gap-x-6 gap-y-3">
                 {NOMINAL_OPTIONS.map((opt) => (
                   <RadioOption
@@ -306,22 +359,21 @@ export default function FormDonasi({
                 ))}
               </div>
 
-              {/* ── Data Diri ─────────────────── */}
+              {/* Data Diri */}
               <div className="flex flex-col gap-8">
-                <p className="font-jakarta text-base leading-6 text-black font-bold uppercase ">
+                <p className="font-jakarta text-base leading-6 text-black font-bold uppercase">
                   Data diri
                 </p>
 
-                {/* Nama */}
                 <FormField
                   id="nama"
                   label="Nama"
                   placeholder="Nama lengkap"
                   value={form.nama}
                   onChange={(v) => setField("nama", v)}
+                  error={errors.nama}
+                  required
                 />
-
-                {/* Email */}
                 <FormField
                   id="email"
                   label="E-mail"
@@ -329,9 +381,9 @@ export default function FormDonasi({
                   placeholder="Alamat e-mail"
                   value={form.email}
                   onChange={(v) => setField("email", v)}
+                  error={errors.email}
+                  required
                 />
-
-                {/* No Telp */}
                 <FormField
                   id="notelp"
                   label="Nomor Telp"
@@ -339,16 +391,17 @@ export default function FormDonasi({
                   placeholder="08xx"
                   value={form.noTelp}
                   onChange={(v) => setField("noTelp", v)}
+                  error={errors.noTelp}
+                  required
                 />
 
-                {/* Conditional — Nominal Lainnya */}
                 <AnimatePresence>
                   {isCustom && (
                     <motion.div
                       key="custom-nominal"
-                      initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                      animate={{ opacity: 1, height: "auto", marginTop: 0 }}
-                      exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
                       transition={{
                         duration: 0.3,
                         ease: [0.25, 0.1, 0.25, 1] as [
@@ -367,28 +420,26 @@ export default function FormDonasi({
                         placeholder="Masukkan nominal donasi"
                         value={form.customNominal}
                         onChange={(v) => setField("customNominal", v)}
+                        error={errors.customNominal}
+                        required
                       />
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
 
-              {/* ── Submit ────────────────────── */}
               <div className="flex flex-col items-start gap-3">
                 <motion.button
                   type="submit"
+                  disabled={loading}
                   whileHover={{ scale: 1.02, opacity: 0.92 }}
                   whileTap={{ scale: 0.97 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="font-jakarta font-semibold text-base text-white px-8 py-4 rounded-full cursor-pointer"
+                  className="font-jakarta font-semibold text-base text-white px-8 py-4 rounded-full cursor-pointer disabled:opacity-60"
                   style={{ backgroundColor: "#00C4B4" }}
                 >
-                  Dukung Sekarang
+                  {loading ? "Memproses..." : "Dukung Sekarang"}
                 </motion.button>
-
-                {/* <p className="font-jakarta text-xs leading-4 text-[#AAAAAA]">
-                  Payment via Midtrans
-                </p> */}
               </div>
             </form>
           </div>

@@ -1,5 +1,6 @@
 "use client";
 import SectionContent from "./SectionContent";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   AnyDukungContent,
@@ -7,6 +8,7 @@ import {
   RichTextBlock,
   RichTextChild,
 } from "@/services/types/dukung";
+import FormKarya from "./FormKarya";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -14,9 +16,7 @@ const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
 };
-
 const VP = { once: true, margin: "-60px" };
-
 // ─── Rich Text renderer ───────────────────────────────────────────────────────
 function renderChildren(children: RichTextChild[]): string {
   return children
@@ -72,17 +72,8 @@ export default function AksiLayout({ data }: { data: AnyDukungContent }) {
             <span className="font-jakarta text-base leading-6 text-black">
               {d.summary}
             </span>
-            <motion.a
-              href={d.link}
-              target="_blank"
-              whileHover={{ scale: 1.02, opacity: 0.92 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="font-jakarta self-start items-start font-semibold text-base text-white px-8 py-4 rounded-full cursor-pointer"
-              style={{ backgroundColor: "#00C4B4" }}
-            >
-              Daftar
-            </motion.a>
+
+            <FormKarya />
           </div>
         </div>
       </SectionContent>

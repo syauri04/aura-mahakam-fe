@@ -28,35 +28,16 @@ export interface FeatureItem {
 }
 
 export interface LanskapSectionProps {
-  /**
-   * Judul besar pertama.
-   * Gunakan \n untuk line break manual jika diperlukan.
-   */
   title: string;
 
-  /**
-   * Teks paragraf panjang — cukup 1 string.
-   * Di desktop ditampilkan dalam 2 kolom via CSS column-count.
-   * Di mobile tampil 1 kolom penuh.
-   */
   bodyText: string;
 
-  /**
-   * Teks note kecil di bawah paragraf (font-jakarta text-base).
-   * Opsional: kata/frasa di awal yang ditebalkan via noteBoldPrefix.
-   */
   noteText: string;
 
-  /**
-   * Kata/frasa di awal noteText yang dibold.
-   * Contoh: "Aura Mahakam" → <strong>Aura Mahakam</strong> hadir sebagai...
-   */
   noteBoldPrefix?: string;
 
-  /** Judul besar kedua */
   title2: string;
 
-  /** Array item untuk 4-kolom feature grid */
   features: FeatureItem[];
 }
 

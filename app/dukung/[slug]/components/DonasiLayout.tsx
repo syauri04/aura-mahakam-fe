@@ -15,7 +15,13 @@ export default function DonasiLayout({ data }: { data: AnyDukungContent }) {
           data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
           strategy="afterInteractive"
         />
-        <FormDonasi />
+        <FormDonasi
+          title={d.title}
+          features={d.blok_dukung.map((b) => ({
+            title: b.title,
+            summary: b.summary,
+          }))}
+        />
       </SectionContent>
       <LanskapSection
         title={d.title_section_1}

@@ -135,8 +135,6 @@ export default function Header() {
         return res.json();
       })
       .then((data) => {
-        // cek response user
-
         if (data?.username) {
           setUser({ username: data.username, email: data.email });
         }
@@ -151,7 +149,6 @@ export default function Header() {
     window.location.href = "/";
   }
 
-  // sync activeLang dari URL
   const activeLang = useMemo(() => {
     const lang = searchParams.get("lang");
     return languages.find((l) => l.code === lang) ?? languages[0];
@@ -201,8 +198,8 @@ export default function Header() {
       <div
         className={[
           "transition-all duration-300",
-          scrolled
-            ? "bg-purple-light/80 backdrop-blur-md shadow-lg"
+          scrolled || mobileOpen
+            ? "bg-purple-light/95 backdrop-blur-md shadow-lg"
             : "bg-transparent",
         ].join(" ")}
       >
@@ -230,7 +227,6 @@ export default function Header() {
             </motion.div>
           </Link>
 
-          {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-6 flex-1 justify-center">
             {activeNavItems.map((item) => {
               const isActive =
@@ -309,7 +305,6 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Right: search + lang + hamburger */}
           <div className="flex items-center gap-3 shrink-0">
             {user ? (
               <div className="relative hidden lg:block">
@@ -371,9 +366,7 @@ export default function Header() {
               </Link>
             )}
 
-            {/* Language picker */}
             <div className="relative">
-              {/* ← fix: onClick hanya toggle dropdown, bukan set lang */}
               <button
                 onClick={() => setLangOpen(!langOpen)}
                 className={[
@@ -433,7 +426,6 @@ export default function Header() {
               </AnimatePresence>
             </div>
 
-            {/* Hamburger — mobile only */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="flex lg:hidden items-center bg-transparent border-none cursor-pointer text-white p-1.5"
@@ -443,7 +435,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile menu */}
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
@@ -451,7 +442,7 @@ export default function Header() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="overflow-hidden border-t border-gold/15"
+              className="overflow-hidden border-t border-gold/15 bg-purple-light/95 backdrop-blur-md"
             >
               <div className="px-6 pt-3 pb-5">
                 {activeNavItems.map((item) => (

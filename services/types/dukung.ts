@@ -48,6 +48,7 @@ export interface DukungDonasi {
   summary: string;
   title_section_2: string;
   block_section: BlockSection[];
+  blok_dukung: BlockSection[];
   __component: "dukung.dukung-donasi";
 }
 
